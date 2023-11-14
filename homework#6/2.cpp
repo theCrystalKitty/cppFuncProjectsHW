@@ -7,7 +7,6 @@ int main()
     
     int* nums = new int[10];
     int rangeStart, rangeEnd, num, sum = 0;
-    short indexMin, indexMax;
 
     cout << "Input a range: ";
     cin >> rangeStart >> rangeEnd;
