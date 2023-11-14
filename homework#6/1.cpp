@@ -7,7 +7,6 @@ int main()
     
     int* nums = new int[10];
     int min = INT32_MAX, max = INT32_MIN;
-    short indexMin, indexMax;
 
     for (short i = 0; i < 10; i++) {
         nums[i] = 1 + rand() % 10;
