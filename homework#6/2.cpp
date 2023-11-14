@@ -13,6 +13,9 @@ int main()
     cout << "Input a number: ";
     cin >> num;
 
+    if(rangeStart > rangeEnd)
+        swap(rangeStart, rangeEnd);
+
     for (short i = 0; i < 10; i++) {
         nums[i] = rangeStart + rand() % (rangeEnd + 1 - rangeStart);
     }
