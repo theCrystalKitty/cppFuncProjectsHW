@@ -30,7 +30,7 @@ int main()
     for (short i = 11, j = deposit; i >= month - 1; i--) {
         if (i == month) {
             if (j / 100 * percent[i] >= 500) {
-                cout << "You can withdraw: $" << (j / 100 * percent[i]) / 2 << endl;
+                cout << "You can withdraw: $" << ((j / 100 * percent[i]) * usdToEur[i]) / 2 << endl;
                 break;
             }
             else
