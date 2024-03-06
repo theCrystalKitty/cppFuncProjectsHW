@@ -162,6 +162,8 @@ void showStringsWithKeyWord(string path, string keyword) {
             } while (check(pons, pon, i));
         }
     }
+
+    in.close();
 }
 
 int main()
