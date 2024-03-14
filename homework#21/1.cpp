@@ -47,7 +47,7 @@ private:
 					for (short i = 0; i < 10; i++) {
 						if (this->lastNumberPlate[0] == LETTERS[i]) {
 							pon = "";
-							pon = pon + LETTERS[i + 1] + "001" + this->lastNumberPlate[4] + this->lastNumberPlate[5];
+							pon = pon + LETTERS[i + 1] + "000" + this->lastNumberPlate[4] + this->lastNumberPlate[5];
 							this->lastNumberPlate = pon;
 						}
 					}
@@ -55,7 +55,7 @@ private:
 				for (short i = 0; i < 10; i++) {
 					if (this->lastNumberPlate[4] == LETTERS[i]) {
 						pon = "";
-						pon = pon + this->lastNumberPlate[0] + "001" + LETTERS[i + 1] + this->lastNumberPlate[5];
+						pon = pon + this->lastNumberPlate[0] + "000" + LETTERS[i + 1] + this->lastNumberPlate[5];
 						this->lastNumberPlate = pon;
 						return;
 					}
@@ -64,7 +64,7 @@ private:
 			for (short i = 0; i < 10; i++) {
 				if (this->lastNumberPlate[5] == LETTERS[i]) {
 					pon = "";
-					pon = pon + this->lastNumberPlate[0] + "001" + this->lastNumberPlate[4] + LETTERS[i + 1];
+					pon = pon + this->lastNumberPlate[0] + "000" + this->lastNumberPlate[4] + LETTERS[i + 1];
 					this->lastNumberPlate = pon;
 					return;
 				}
