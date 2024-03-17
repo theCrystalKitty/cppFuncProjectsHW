@@ -67,3 +67,5 @@
     - 1.cpp, task1.h, task2.h - К/р
 21. homework#21
     - 1.cpp - изменение номерного знака от A000AA -> A001AA -> ... -> A999AA -> A000AB
+21. project
+    - 1.cpp - нарды
