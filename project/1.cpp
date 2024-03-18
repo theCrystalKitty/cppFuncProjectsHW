@@ -179,21 +179,32 @@ int letterToIndex(char letter) {
     }
 }
 
-int lengthBetweenCoords(int coords[]) {
+int lengthBetweenCoords(int coords[], bool greenMove) {
     if (coords[0] > coords[2]) {
-        return 12 - coords[1] + 12 - coords[3] - 1;
+        if (!greenMove) {
+            return 12 - coords[1] + 12 - coords[3] - 1;
+        }
+        return -1;
     }
     else if (coords[0] == coords[2]) {
-        return (coords[3] > coords[1]) ? coords[3] - coords[1] : coords[1] - coords[3];
+        if (coords[0] == 0) {
+            return (coords[3] < coords[1]) ? coords[1] - coords[3] : -1;
+        }
+        else {
+            return (coords[3] > coords[1]) ? coords[3] - coords[1] : -1;
+        }
     }
     else {
-        return coords[3] + coords[1] + 1;
+        if (greenMove) {
+            return coords[3] + coords[1] + 1;
+        }
+        return -1;
     }
 }
 
 //checks if a user can go to the specified coordinates
 bool canGo(string** field, bool greenMove, int coords[], int moves[], int movesLeft) {
-    int len = lengthBetweenCoords(coords);
+    int len = lengthBetweenCoords(coords, greenMove);
     for (int i = 0; i < movesLeft; i++) {
         if (len == moves[i] && (field[coords[2]][coords[3]] == " " || field[coords[2]][coords[3]] == ((greenMove) ? "\x1B[32m*\033[0m" : "\x1B[31m*\033[0m"))) {
             return true;
@@ -229,11 +240,27 @@ bool canWithdraw(string** field, const int size1, const int size2, int coords[],
         lenCoords = new int[4] { coords[0], coords[1], 0, 0 };
     }
     for (int i = 0; i < movesLeft; i++) {
-        if (lengthBetweenCoords(lenCoords) == moves[i]) {
+        if (lengthBetweenCoords(lenCoords, greenMove) == moves[i]) {
             return true;
         }
     }
     return false;
+}
+
+void delElArr(int*& arr, int &size, int target, bool greenMove) {
+    int* buf = new int[size - 1];
+
+    for (int i = 0, k = 0, flag = false; i < size; i++) {
+        if (arr[i] == target && !flag) {
+            flag = true;
+            continue;
+        }
+        buf[k++] = arr[i];
+    }
+
+    size--;
+    delete[]arr;
+    arr = buf;
 }
 
 //initiates a move
@@ -291,7 +318,7 @@ void move(string** field, const int size1, const int size2, bool &greenMove, boo
     isFirstMove[((greenMove) ? 0 : 1)] = false;
 
     //moves
-    for (short i = 0; i < movesLeft; i++) {
+    for (short i = 0, k = movesLeft; i < k; i++) {
         if (!checkMoves(field, size1, size2, moves, greenMove, tookFromStart)) {
             cout << "No moves left!" << endl;
             system("pause");
@@ -301,7 +328,11 @@ void move(string** field, const int size1, const int size2, bool &greenMove, boo
         //selecting a piece
         while (!flag) {
             flag = true;
-            cout << "Input coordinates of what piece to move(number letter): ";
+            cout << "Moves left: ";
+            for (int i = 0; i < movesLeft; i++) {
+                cout << moves[i] << ' ';
+            }
+            cout << endl << "Input coordinates of what piece to move(number letter): ";
             cin >> a >> b;
             if (a == 1) {
                 coords[0] = 0;
@@ -310,7 +341,6 @@ void move(string** field, const int size1, const int size2, bool &greenMove, boo
                 coords[0] = 29;
             }
             coords[1] = letterToIndex(b);
-            cout << coords[0] << ' ' << coords[1];
             if ((coords[0] != 0 && coords[0] != 29) || coords[1] == -1) {
                 cout << "Incorrect coordinates!" << endl;
                 flag = false;
@@ -330,10 +360,10 @@ void move(string** field, const int size1, const int size2, bool &greenMove, boo
 
         //highlighting the selected piece and saving coordinates
         int* selectedPieceCoords = new int[2];
-        for (short i = 0; i < 16; i++) {
-            if (field[(coords[0] == 0) ? coords[0] + i : coords[0] - i][coords[1]] != ((greenMove) ? "\x1B[32m*\033[0m" : "\x1B[31m*\033[0m")) {
-                field[(coords[0] == 0) ? coords[0] + i - 1 : coords[0] - i + 1][coords[1]] = ((greenMove) ? "\033[32;43m*\033[0;0m" : "\033[31;43m*\033[0;0m");
-                selectedPieceCoords[0] = ((coords[0] == 0) ? coords[0] + i - 1 : coords[0] - i + 1);
+        for (short j = 0; j < 16; j++) {
+            if (field[(coords[0] == 0) ? coords[0] + j : coords[0] - j][coords[1]] != ((greenMove) ? "\x1B[32m*\033[0m" : "\x1B[31m*\033[0m")) {
+                field[(coords[0] == 0) ? coords[0] + j - 1 : coords[0] - j + 1][coords[1]] = ((greenMove) ? "\033[32;43m*\033[0;0m" : "\033[31;43m*\033[0;0m");
+                selectedPieceCoords[0] = ((coords[0] == 0) ? coords[0] + j - 1 : coords[0] - j + 1);
                 selectedPieceCoords[1] = coords[1];
                 break;
             }
@@ -345,7 +375,11 @@ void move(string** field, const int size1, const int size2, bool &greenMove, boo
         //selecting where to place the selected piece
         while (!flag) {
             flag = true;
-            cout << "Input coordinates of where to move the selected piece(number letter or W W to withdraw): ";
+            cout << "Moves left: ";
+            for (int i = 0; i < movesLeft; i++) {
+                cout << moves[i] << ' ';
+            }
+            cout << endl << "Input coordinates of where to move the selected piece(number letter or W W to withdraw): ";
             cin >> a >> b;
             if (b == 'W') { 
                 if (!canWithdraw(field, size1, size2, coords, moves, movesLeft, greenMove)) {
@@ -363,7 +397,6 @@ void move(string** field, const int size1, const int size2, bool &greenMove, boo
                 coords[2] = 29;
             }
             coords[3] = letterToIndex(b);
-            cout << coords[0] << ' ' << coords[1] << ' ' << coords[2] << ' ' << coords[3] << ' ' << lengthBetweenCoords(coords);
             if ((coords[2] != 0 && coords[2] != 29) || coords[3] == -1) {
                 cout << "Incorrect coordinates!" << endl;
                 flag = false;
@@ -396,6 +429,9 @@ void move(string** field, const int size1, const int size2, bool &greenMove, boo
                 }
             }
         }
+
+        //removing made move from moves array
+        delElArr(moves, movesLeft, lengthBetweenCoords(coords, greenMove), greenMove);
 
         if ((coords[0] == 0 && coords[1] == 11) || (coords[0] == 29 && coords[1] == 0)) {
             tookFromStart[((tookFromStart[1]) ? 0 : 1)] = true;
